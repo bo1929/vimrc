@@ -33,10 +33,7 @@ nnoremap Q @@
 vnoremap ~ y:call setreg('', TwiddleCase(@"), getregtype(''))<CR>gv""Pgv
 
 " Toggle background, light or dark.
-noremap <silent> <F3> :call ToggleBG()<CR>
-
-" Toggle vertical explorer.
-noremap <silent> <leader>- :call ToggleNetrwExplorer()<CR>
+noremap <silent> <leader>BG :call ToggleBG()<CR>
 
 " Disable arrow-keys.
 noremap <Up> <Nop>
@@ -71,9 +68,9 @@ augroup END
 function! MapNetrwKeyBindings()
   " Toggle vertical explorer.
   noremap <buffer> <silent> <leader>- :call ToggleNetrwExplorer()<CR>
-  nmap <buffer> <silent> <Tab> <CR>:call SwitchNetrwWindow()<CR>
+  noremap <buffer> <silent> <leader><Tab> :call SwitchNetrwWindow()<CR>
 endfunction
 
 augroup NetrwMappings
-  autocmd Filetype netrw call MapNetrwKeyBindings()
+  autocmd VimEnter * call MapNetrwKeyBindings()
 augroup END

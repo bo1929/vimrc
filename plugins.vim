@@ -51,6 +51,12 @@ call plug#begin('~/.vim/vim-plug')
   let g:qs_highlight_on_keys=['f', 'F', 't', 'T']
   let g:qs_max_chars=120
   " }}}
+  " === auto-popmenu === {{{
+  Plug        'skywind3000/vim-auto-popmenu'
+  let g:apc_enable_ft={"*":1}
+  let g:apc_enable_tab=0
+  let g:apc_cr_confirm=1
+  " }}}
   " === xptemplate === {{{
   Plug	      'drmingdrmer/xptemplate'
   let g:xptemplate_minimal_prefix=0
@@ -92,6 +98,9 @@ call plug#begin('~/.vim/vim-plug')
   " === abolish === {{{
     Plug        'tpope/vim-abolish'
   " }}}
+  " === fugitive === {{{
+    Plug        'tpope/vim-fugitive'
+  " }}}
   " === obsession === {{{
     Plug        'tpope/vim-obsession'
   " }}}
@@ -107,20 +116,14 @@ call plug#begin('~/.vim/vim-plug')
   " === eunuch === {{{
     Plug        'tpope/vim-eunuch'
   " }}}
+  " === asyncrun === {{{
+  Plug	      'skywind3000/asyncrun.vim'
+  " }}}
   " === cxx === {{{
   " === vim-cpp-modern === {{{
   Plug        'bfrg/vim-cpp-modern'
   " }}}
-  " }}}
-  " === vimwiki === {{{
-  Plug 'vimwiki/vimwiki'
-  let g:vimwiki_list = [{'path': '~/Documents/Notes/',
-                          \ 'syntax': 'markdown', 'ext': '.md'}]
-  let g:vimwiki_global_ext = 0
-  " }}}
-  " === literate === {{{
-  Plug 'zyedidia/literate.vim'
-  " }}}
+
   " === markdown === {{{
   " === vim-markdown === {{{
   " Plug	      'bo1929/vim-markdown'
@@ -189,5 +192,14 @@ Plug 'junegunn/goyo.vim'
   " === lsp === {{{
   Plug 'prabirshrestha/vim-lsp'
   Plug 'mattn/vim-lsp-settings'
+  Plug 'prabirshrestha/asyncomplete.vim'
+  Plug 'prabirshrestha/asyncomplete-lsp.vim'
+  let g:asyncomplete_auto_completeopt=1
+ 	Plug 'hiterm/asyncomplete-look'
+  au User asyncomplete_setup call asyncomplete#register_source({
+			\ 'name': 'look',
+			\ 'whitelist': ['markdown', 'vimwiki'],
+			\ 'completor': function('asyncomplete#sources#look#completor'),
+			\ })
   " }}}
 call plug#end()

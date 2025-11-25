@@ -25,7 +25,7 @@ call plug#begin('~/.vim/vim-plug')
 
   " === lightline === {{{
     Plug        'itchyny/lightline.vim'
-    let g:lightline = {
+    let g:lightline={
       \ 'colorscheme': 'everforest',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
@@ -110,6 +110,9 @@ call plug#begin('~/.vim/vim-plug')
 
   " === matchup === {{{
     Plug        'andymass/vim-matchup'
+    highlight! OffscreenPopup guibg=red guifg=blue
+    let g:matchup_matchparen_offscreen
+        \ = {'method': 'status_manual'}
   " }}}
 
   " === cxx === {{{
@@ -117,14 +120,14 @@ call plug#begin('~/.vim/vim-plug')
   " }}}
 
   " === markdown === {{{
-    Plug	      'tpope/vim-markdown'
+    Plug	      'bo1929/vim-markdown'
     Plug        'godlygeek/tabular'
   " }}}
 
   " === la/tex === {{{ 
     if executable('latexmk')
       Plug        'lervag/vimtex'
-      let g:vimtex_compiler_latexmk_engines = {
+      let g:vimtex_compiler_latexmk_engines={
           \ '_': '-xelatex',
         \}
       let g:tex_fast=""
@@ -174,6 +177,20 @@ call plug#begin('~/.vim/vim-plug')
         \ 'whitelist': ['markdown'],
         \ 'completor': function('asyncomplete#sources#look#completor'),
         \ })
+    let g:lsp_document_highlight_enabled=1
+    highlight lspReference ctermfg=red guifg=red ctermbg=green guibg=green
+    let g:lsp_semantic_enabled=1
+    let g:lsp_diagnostics_echo_cursor=1
+    " let g:lsp_diagnostics_float_cursor=1
+    let g:lsp_diagnostics_highlights_enabled=1
+    highlight link LspErrorHighlight Error
+    let g:lsp_diagnostics_signs_error={'text': '✗'}
+    let g:lsp_diagnostics_signs_warning={'text': '¿'}
+    let g:lsp_diagnostics_virtual_text_enabled=0
+    " set foldmethod=expr
+    "   \ foldexpr=lsp#ui#vim#folding#foldexpr()
+    "   \ foldtext=lsp#ui#vim#folding#foldtext()
+    " let g:lsp_fold_enabled=1
   " }}}
 
 call plug#end()

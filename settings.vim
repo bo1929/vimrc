@@ -75,7 +75,7 @@ if isdirectory(netrw_directory)
 endif
 let g:netrw_banner=0
 let g:netrw_liststyle=3
-let g:netrw_altv = 1
+let g:netrw_altv=1
 let g:netrw_preview=1
 let g:netrw_browse_split=4
 let g:netrw_winsize=50
@@ -163,10 +163,10 @@ if exists('+termguicolors')
   set termguicolors
 endif
 
-let &t_Ts = "\e[9m"   " Strikethrough
-let &t_Te = "\e[29m"
-let &t_Cs = "\e[4:3m" " Undercurl
-let &t_Ce = "\e[4:0m"
+let &t_Ts="\e[9m"   " Strikethrough
+let &t_Te="\e[29m"
+let &t_Cs="\e[4:3m" " Undercurl
+let &t_Ce="\e[4:0m"
 
 try
   colorscheme everforest

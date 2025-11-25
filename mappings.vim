@@ -51,10 +51,10 @@ nnoremap <leader>"s :%s/<C-R>"/<text>/g
 
 function! MapPluginKeyBindings()
   if exists(":TagbarToggle")
-    nnoremap <silent> <F5> :TagbarToggle<CR>
+    nnoremap <silent> <leader>T :TagbarToggle<CR>
   endif
   if exists(":LspDocumentDiagnostics")
-    nnoremap <silent> <F3> :call ToggleDiagnosticsLSP()<CR>
+    nnoremap <silent> <leader>L :call ToggleDiagnosticsLSP()<CR>
   endif
   if exists("*asyncomplete#close_popup")
     inoremap <expr> <cr> pumvisible() ? asyncomplete#close_popup() . "\<cr>" : "\<cr>"
@@ -68,7 +68,7 @@ augroup END
 function! MapNetrwKeyBindings()
   " Toggle vertical explorer.
   noremap <buffer> <silent> <leader>- :call ToggleNetrwExplorer()<CR>
-  noremap <buffer> <silent> <leader><Tab> :call SwitchNetrwWindow()<CR>
+  noremap <buffer> <silent> <leader>+ :call SwitchNetrwWindow()<CR>
 endfunction
 
 augroup NetrwMappings

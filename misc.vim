@@ -1,8 +1,8 @@
 " Toggle netrw explorer window.
 function! ToggleNetrwExplorer()
   if exists("t:expl_buf_num")
-    let expl_win_num = bufwinnr(t:expl_buf_num)
-    if expl_win_num != -1
+    let expl_win_num=bufwinnr(t:expl_buf_num)
+    if expl_win_num!=-1
         exec  expl_win_num .. "wincmd w"
       try
         close
@@ -13,15 +13,15 @@ function! ToggleNetrwExplorer()
     unlet t:expl_buf_num
   else
     20Lexplore
-    let t:expl_buf_num = bufnr("%")
+    let t:expl_buf_num=bufnr("%")
   endif
 endfunction
 
 " Swicth to netrw explorer window.
 function! SwitchNetrwWindow()
   if exists("t:expl_buf_num")
-    let expl_win_num = bufwinnr(t:expl_buf_num)
-    if expl_win_num != -1
+    let expl_win_num=bufwinnr(t:expl_buf_num)
+    if expl_win_num!=-1
       exec expl_win_num . "wincmd w"
     endif
   endif
@@ -41,10 +41,10 @@ endfunction
 
 " Alignment for tables using Tabularize.
 function! AlignTable()
-  let p = '^\s*|\s.*\s|\s*$'
+  let p='^\s*|\s.*\s|\s*$'
   if exists(":Tabularize") && getline('.') =~# '^\s*|' && (getline(line('.')-1) =~# p || getline(line('.')+1) =~# p)
-    let column = strlen(substitute(getline('.')[0:col('.')],'[^|]','','g'))
-    let position = strlen(matchstr(getline('.')[0:col('.')],'.*|\s*\zs.*'))
+    let column=strlen(substitute(getline('.')[0:col('.')],'[^|]','','g'))
+    let position=strlen(matchstr(getline('.')[0:col('.')],'.*|\s*\zs.*'))
     Tabularize/|/l1
     normal! 0
     call search(repeat('[^|]*|',column).'\s\{-\}'.repeat('.',position),'ce',line('.'))
@@ -71,7 +71,7 @@ function! HiClear()
 endfunction
 
 function! ToggleBG()
-  let &background = ( &background == "dark"? "light" : "dark" )
+  let &background=( &background == "dark"? "light" : "dark" )
   if exists("g:colors_name")
     exe "colorscheme " . g:colors_name
   endif
@@ -81,15 +81,15 @@ function! ToggleBG()
 endfunction
 
 function! DotFoldText()
-  let nblines = v:foldend - v:foldstart + 1
-  let w = winwidth(0) - &foldcolumn - (&number ? 3 : 0)
-  let expansionString = repeat(".", w - strwidth(nblines.'"') - 1)
-  let txt = nblines . " " . expansionString
+  let nblines=v:foldend - v:foldstart + 1
+  let w=winwidth(0) - &foldcolumn - (&number ? 3 : 0)
+  let expansionString=repeat(".", w - strwidth(nblines.'"') - 1)
+  let txt=nblines . " " . expansionString
   return txt
 endfunction
 
 fun! TrimWhitespace()
-  let l:save = winsaveview()
+  let l:save=winsaveview()
   keeppatterns %s/\s\+$//e
   call winrestview(l:save)
 endfun
@@ -98,10 +98,10 @@ function! OneSentencePerLine()
   if mode() =~# '^[iR]'
     return
   endif
-  let indentation_level = indent('.') / &shiftwidth
-  let indentation_command = repeat('>', indentation_level)
-  let start = v:lnum
-  let end = start + v:count - 1
+  let indentation_level=indent('.') / &shiftwidth
+  let indentation_command=repeat('>', indentation_level)
+  let start=v:lnum
+  let end=start + v:count - 1
   execute start.','.end.'join'
   s/\(^\s*\d\+\)\@<!\(\<al\)\@<![.!?] \zs\s*\ze\S/\r/g
   call TrimWhitespace()

@@ -12,7 +12,7 @@ function! ToggleNetrwExplorer()
     endif
     unlet t:expl_buf_num
   else
-    20Lexplore
+    25Lexplore
     let t:expl_buf_num=bufnr("%")
   endif
 endfunction

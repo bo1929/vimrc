@@ -5,9 +5,12 @@ if empty(glob('~/.vim/autoload/plug.vim'))
 endif 
 
 " Run PlugInstall if there are missing plugins.
-autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
-  \| PlugInstall
-\| endif
+augroup PlugAutoInstall
+  autocmd!
+  autocmd VimEnter * if exists('g:plugs') && len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
+    \| PlugInstall
+  \| endif
+augroup END
 
 call plug#begin('~/.vim/vim-plug')
   " === basics === {{{
@@ -66,49 +69,24 @@ call plug#begin('~/.vim/vim-plug')
   let g:qs_max_chars=120
   " }}}
 
-  " === auto-popmenu === {{{
-    Plug        'skywind3000/vim-auto-popmenu'
-    let g:apc_enable_ft={"*":1}
-    let g:apc_enable_tab=0
-    let g:apc_cr_confirm=1
-  " }}}
-
-  " === xptemplate === {{{
-  Plug	      'drmingdrmer/xptemplate'
-  let g:xptemplate_minimal_prefix=0
-  " }}}
-
   " === gutentags === {{{
   if executable('ctags')
     Plug        'ludovicchabant/vim-gutentags'
+    " Keep tag files out of project roots.
+    call mkdir($HOME . '/.cache/vim/tags', 'p')
+    let g:gutentags_cache_dir=$HOME . '/.cache/vim/tags'
   endif
   " }}}
 
-  " === ctrlp === {{{
-  " Plug        'ctrlpvim/ctrlp.vim'
-  " " Use fd or rg for ctrlp.
-  " let g:ctrlp_use_caching=0
-  " if executable('fd')
-  "   let g:ctrlp_user_command='fd --type f --color=never "" %s'
-  " elseif executable('rg')
-  "   set grepprg=rg\ --color=never
-  "   let g:ctrlp_user_command='rg %s --files --color=never --glob ""'
-  " else
-  "   let g:ctrlp_use_caching=1
-  "   let g:ctrlp_clear_cache_on_exit=0
-  " endif
-  " }}}
-
-  " === tagbar === {{{
-  " if executable('ctags')
-  "   Plug	      'preservim/tagbar'
-  "   " let g:tagbar_position='leftabove vertical'
-  " endif
+  " === vista === {{{
+  if executable('ctags')
+    Plug 'liuchengxu/vista.vim'
+    let g:vista_default_executive = 'ctags'
+  endif
   " }}}
 
   " === matchup === {{{
   Plug        'andymass/vim-matchup'
-  highlight! OffscreenPopup guibg=red guifg=blue
   let g:matchup_matchparen_offscreen = {'method': 'status_manual'}
   " }}}
 
@@ -125,8 +103,8 @@ call plug#begin('~/.vim/vim-plug')
   " === la/tex === {{{ 
   if executable('latexmk')
     Plug        'lervag/vimtex'
-    let g:vimtex_compiler_latexmk_engines={
-        \ '_': '-xelatex',
+    let g:vimtex_compiler_latexmk_engines={'_': '-xelatex'}
+    let g:vimtex_compiler_latexmk={
         \ 'aux_dir' : '/tmp',
         \ 'out_dir' : '/tmp',
       \}
@@ -157,14 +135,6 @@ call plug#begin('~/.vim/vim-plug')
     let g:jupytext_fmt='py'
   endif
   " }}}
-  " === khuno === {{{
-  if executable('flake8')
-    Plug        'alfredodeza/khuno.vim'
-    let g:khuno_flake_cmd=$HOME . "/.local/pipx/venvs/flake8/bin/flake8"
-    let g:khuno_builtins="_,apply"
-    let g:khuno_max_line_length=99
-  endif
-  " }}}
   " }}}
 
   " === asyncrun === {{{
@@ -174,7 +144,8 @@ call plug#begin('~/.vim/vim-plug')
   " === asyncomplete === {{{
   Plug 'prabirshrestha/asyncomplete.vim'
   Plug 'prabirshrestha/asyncomplete-lsp.vim'
-  let g:asyncomplete_auto_completeopt=1
+  " Keep our own completeopt (with preview) instead of asyncomplete's.
+  let g:asyncomplete_auto_completeopt=0
   Plug 'hiterm/asyncomplete-look'
   au User asyncomplete_setup call asyncomplete#register_source({
     \ 'name': 'look',
@@ -193,8 +164,8 @@ call plug#begin('~/.vim/vim-plug')
   let g:lsp_semantic_enabled=0
   let g:lsp_diagnostics_echo_cursor=0
   " let g:lsp_diagnostics_float_cursor=1
-  highlight link LspErrorHighlight Error
-  highlight lspReference ctermfg=red guifg=red ctermbg=green guibg=green
+  " Custom LspErrorHighlight/lspReference highlights live in misc.vim's
+  " AdaptColorScheme autocmd — set here they get wiped by :hi clear.
   let g:lsp_diagnostics_signs_error={'text': '✗'}
   let g:lsp_diagnostics_signs_warning={'text': '¿'}
   let g:lsp_diagnostics_virtual_text_enabled=0
@@ -203,6 +174,38 @@ call plug#begin('~/.vim/vim-plug')
   "   \ foldtext=lsp#ui#vim#folding#foldtext()
   " let g:lsp_fold_enabled=1
   " Plug 'Exafunction/windsurf.vim'
+  " }}}
+
+""" Inactive:
+  " === auto-popmenu === {{{
+  " Disabled: redundant with asyncomplete — both auto-drive the popup menu
+  " and fight over <CR>/completeopt. asyncomplete (LSP + look) wins.
+  " Plug        'skywind3000/vim-auto-popmenu'
+  " let g:apc_enable_ft={"*":1}
+  " let g:apc_enable_tab=0
+  " let g:apc_cr_confirm=1
+  " }}}
+
+  " === tagbar === {{{
+  " if executable('ctags')
+  "   Plug	      'preservim/tagbar'
+  "   " let g:tagbar_position='leftabove vertical'
+  " endif
+  " }}}
+
+  " === ctrlp === {{{
+  " Plug        'ctrlpvim/ctrlp.vim'
+  " " Use fd or rg for ctrlp.
+  " let g:ctrlp_use_caching=0
+  " if executable('fd')
+  "   let g:ctrlp_user_command='fd --type f --color=never "" %s'
+  " elseif executable('rg')
+  "   set grepprg=rg\ --color=never
+  "   let g:ctrlp_user_command='rg %s --files --color=never --glob ""'
+  " else
+  "   let g:ctrlp_use_caching=1
+  "   let g:ctrlp_clear_cache_on_exit=0
+  " endif
   " }}}
 
 call plug#end()

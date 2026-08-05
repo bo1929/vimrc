@@ -1,19 +1,8 @@
-let plugins_path=$HOME . '/.vim/plugins.vim'
-if filereadable(plugins_path)
-  exec 'source' . plugins_path
-endif
-
-let misc_path=$HOME . '/.vim/misc.vim'
-if filereadable(misc_path)
-  exec 'source' . misc_path
-endif
-
-let mappings_path=$HOME . '/.vim/mappings.vim'
-if filereadable(mappings_path)
-  exec 'source' . mappings_path
-endif
-
-let settings_path=$HOME . '/.vim/settings.vim'
-if filereadable(settings_path)
-  exec 'source' . settings_path
-endif
+" Source the modular config files, in order.
+for s:config_file in ['plugins.vim', 'misc.vim', 'mappings.vim', 'settings.vim']
+  let s:config_path=$HOME . '/.vim/' . s:config_file
+  if filereadable(s:config_path)
+    execute 'source ' . fnameescape(s:config_path)
+  endif
+endfor
+unlet s:config_file s:config_path

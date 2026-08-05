@@ -1,5 +1,8 @@
+" Use Vim defaults (must come first, it resets other options).
+if &compatible
+  set nocompatible
+endif
 filetype plugin indent on
-set nocompatible
 set encoding=utf-8
 
 " === General Settings === {{{
@@ -102,8 +105,11 @@ set softtabstop=2
 set hlsearch
 " Do incremental searching.
 set incsearch
-" Case-insensitive search.
+" Case-insensitive file completion.
 set wildignorecase
+" Case-insensitive search, unless the pattern has uppercase letters.
+set ignorecase
+set smartcase
 " Make :grep use rg, if available.
 if executable("rg")
   set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
@@ -112,10 +118,6 @@ endif
 " }}}
 
 " === Cursor === {{{
-" Change cursor while chaning mode.
-let &t_SI="\e[6 q"
-" Change cursor while chaning mode.
-let &t_EI="\e[2 q"
 " Stop cursor blanking.
 set guicursor+=a:blinkon0
 " Do not show cursor-line.
@@ -128,7 +130,7 @@ set nocursorcolumn
 " Do not use wrapping and related settings.
 set nowrap
 set nojoinspaces
-set textwidth=0 
+set textwidth=0
 set wrapmargin=0
 set sidescroll=1
 set listchars+=precedes:<,extends:>

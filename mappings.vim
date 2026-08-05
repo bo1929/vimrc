@@ -21,7 +21,7 @@ noremap <leader>c "_c
 nnoremap <leader>bl <C-^>
 " Use <leader>bn to toggle to the next buffer.
 noremap <silent> <leader>bn :bn<CR>
-" Use <leader>bl to toggle to the previous buffer.
+" Use <leader>bp to toggle to the previous buffer.
 noremap <silent> <leader>bp :bp<CR>
 " Use <leader>bd to delete the current buffer.
 noremap <silent> <leader>bd :bd<CR>
@@ -56,21 +56,16 @@ function! MapPluginKeyBindings()
   if exists(":LspDocumentDiagnostics")
     nnoremap <silent> <leader>L :call ToggleDiagnosticsLSP()<CR>
   endif
-  if exists("*asyncomplete#close_popup")
-    inoremap <expr> <cr> pumvisible() ? asyncomplete#close_popup() . "\<cr>" : "\<cr>"
-  endif
+  " Confirm popup selection with <CR> (asyncomplete is autoloaded on first use).
+  inoremap <expr> <cr> pumvisible() ? asyncomplete#close_popup() . "\<cr>" : "\<cr>"
 endfunction
 
 augroup PluginMappings
+  autocmd!
   autocmd VimEnter * call MapPluginKeyBindings()
 augroup END
 
-function! MapNetrwKeyBindings()
-  " Toggle vertical explorer.
-  noremap <buffer> <silent> <leader>- :call ToggleNetrwExplorer()<CR>
-  noremap <buffer> <silent> <leader>+ :call SwitchNetrwWindow()<CR>
-endfunction
-
-augroup NetrwMappings
-  autocmd VimEnter * call MapNetrwKeyBindings()
-augroup END
+" Toggle the vertical netrw explorer from any buffer.
+nnoremap <silent> <leader>- :call ToggleNetrwExplorer()<CR>
+" Jump to the netrw explorer window from any buffer.
+nnoremap <silent> <leader>+ :call SwitchNetrwWindow()<CR>

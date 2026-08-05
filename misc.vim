@@ -2,19 +2,20 @@
 function! ToggleNetrwExplorer()
   if exists("t:expl_buf_num")
     let expl_win_num=bufwinnr(t:expl_buf_num)
-    if expl_win_num!=-1
-        exec  expl_win_num .. "wincmd w"
+    unlet t:expl_buf_num
+    if expl_win_num != -1
+      exec expl_win_num . "wincmd w"
       try
         close
       catch /^Vim\%((\a\+)\)\=:E444/
         b#
       endtry
+      return
     endif
-    unlet t:expl_buf_num
-  else
-    25Lexplore
-    let t:expl_buf_num=bufnr("%")
+    " Explorer buffer was hidden, fall through and reopen it.
   endif
+  25Lexplore
+  let t:expl_buf_num=bufnr("%")
 endfunction
 
 " Swicth to netrw explorer window.
@@ -148,9 +149,9 @@ augroup SetupAutoCompletion
   autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 augroup END
 
-function ToggleDiagnosticsLSP()
+function! ToggleDiagnosticsLSP()
   if exists('*lsp#disable_diagnostics_for_buffer')
-    if  b:lsp_diagnostics_enabled == 1
+    if get(b:, 'lsp_diagnostics_enabled', 0)
         call lsp#disable_diagnostics_for_buffer()
         let b:lsp_diagnostics_enabled=0
         " echo "LSP diagnostics is disabled."
@@ -164,29 +165,38 @@ function ToggleDiagnosticsLSP()
   endif
 endfunction
 
-function InitializeDiagnosticsLSP()
-  if exists(":LspDocumentDiagnostics")
+" Record the initial (enabled) state once per buffer; the actual
+" enable/disable is left to vim-lsp and the <leader>L toggle.
+function! InitializeDiagnosticsLSP()
+  if exists(":LspDocumentDiagnostics") && !exists("b:lsp_diagnostics_enabled")
     let b:lsp_diagnostics_enabled=1
-    call ToggleDiagnosticsLSP()
   endif
 endfunction
 
 augroup InitDiagnosticsLSP
+  autocmd!
   autocmd BufEnter * call InitializeDiagnosticsLSP()
 augroup END
 
 augroup ResetCursorShape
+  autocmd!
   " Reset cursor on startup
   autocmd VimEnter * :normal :startinsert :stopinsert 
 augroup END
 
 augroup AdaptColorScheme
+  autocmd!
   " Adapt color scheme.
   autocmd ColorScheme * call HiNoneBG()
   autocmd ColorScheme * call HiClear()
+  " Re-apply custom LSP highlights after the colorscheme's :hi clear.
+  " Set before vim-lsp loads so its 'highlight default link' won't override.
+  autocmd ColorScheme * highlight link LspErrorHighlight Error
+  autocmd ColorScheme * highlight lspReference ctermfg=red guifg=red ctermbg=green guibg=green
 augroup END
 
 augroup SetFormatOptions
+  autocmd!
   " Format options.
   " autocmd Filetype * setlocal fo=tcq1lnp
   autocmd Filetype * setlocal fo-=r fo-=o

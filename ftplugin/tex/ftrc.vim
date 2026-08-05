@@ -9,7 +9,7 @@ setlocal conceallevel=2
 
 setlocal complete+=k
 
-set formatexpr=OneSentencePerLine()
+setlocal formatexpr=OneSentencePerLine()
 
 function! IndentLatex()
   if executable('latexindent')

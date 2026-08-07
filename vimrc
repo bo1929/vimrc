@@ -1,3 +1,9 @@
+" Use Vim settings, not Vi.
+" Must come first: everything sourced below relies on nocompatible features.
+if &compatible
+  set nocompatible
+endif
+
 " Source the modular config files, in order.
 for s:config_file in ['plugins.vim', 'misc.vim', 'mappings.vim', 'settings.vim']
   let s:config_path=$HOME . '/.vim/' . s:config_file

@@ -158,18 +158,33 @@ set foldmethod=marker
 " }}}
 
 " === Visual Related === {{{
+" !!!: t_Co and termguicolors must be set before the colorscheme. 
+set t_Co=256
+if exists('+termguicolors')
+  " Truecolor support
+  let &t_ut=''
+  let &t_RF = "\e]10;?\e\\"
+  let &t_RB = "\e]11;?\e\\"
+  let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
+  set termguicolors
+endif
+
+" Adopt the terminal's canonical theme.
+" Fall back to the g:active_colorscheme:
+" (default from plugins.vim when unavailable)
+if !SyncColorschemeWithTerminal()
+  if g:active_colorscheme ==# 'gruvbox'
+    set background=dark
+  else
+    set background=light
+  endif
+endif
 try
-  colorscheme everforest
+  execute 'colorscheme ' . g:active_colorscheme
 catch /^Vim\%((\a\+)\)\=:E185/
   colorscheme darkblue
 endtry
-
-" if has('gui_running')
-set background=light
-" else
-" set background=dark
-set t_Co=256
-" endif
 
 " Set the vertical split character to a space.
 set fillchars+=vert:\ 
@@ -212,14 +227,4 @@ let &t_fd = "\e[?1004l"
 " Window title
 let &t_ST = "\e[22;2t"
 let &t_RT = "\e[23;2t"
-
-if exists('+termguicolors')
-  " Truecolor support
-  let &t_ut=''
-  let &t_RF = "\e]10;?\e\\"
-  let &t_RB = "\e]11;?\e\\"
-  let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
-  let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
-  set termguicolors
-endif
 " }}}

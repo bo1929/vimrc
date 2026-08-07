@@ -53,22 +53,121 @@ function! AlignTable()
 endfunction
 
 function! HiNoneBG()
+  " Transparent editor background.
   hi Normal guibg=NONE ctermbg=NONE
   hi Folded guibg=NONE ctermbg=NONE
+  " Gutters, separators and filler areas too.
+  hi SignColumn guibg=NONE ctermbg=NONE
+  hi FoldColumn guibg=NONE ctermbg=NONE
+  hi LineNr guibg=NONE ctermbg=NONE
+  hi CursorLineNr guibg=NONE ctermbg=NONE
+  hi NonText guibg=NONE ctermbg=NONE
+  hi EndOfBuffer guibg=NONE ctermbg=NONE
+  hi VertSplit guibg=NONE ctermbg=NONE
+  hi WinSeparator guibg=NONE ctermbg=NONE
+  hi NormalNC guibg=NONE ctermbg=NONE
   " hi CursorColumn cterm=NONE ctermbg=NONE ctermfg=NONE
   " hi CursorLine cterm=NONE ctermbg=NONE ctermfg=NONE
-  " hi CursorLineNr cterm=NONE ctermbg=NONE ctermfg=NONE
   " hi SpecialKey ctermbg=NONE
-  " hi NonText ctermbg=NONE
-  " hi VertSplit ctermbg=NONE
-  " hi LineNr ctermbg=NONE
-  " hi SignColumn ctermbg=NONE
+endfunction
+
+" Severity/diagnostic styling: colored fg + undercurl, no solid boxes.
+" Links to the active scheme's own groups, so colors follow the scheme.
+function! SetPlugHi()
+  " matchparen/vim-matchup pairs: bold underline, no box.
+  highlight MatchParen cterm=bold,underline gui=bold,underline ctermbg=NONE guibg=NONE
+  " Symbol references: underline, no block.
+  highlight lspReference cterm=underline gui=underline ctermbg=NONE guibg=NONE
+  if get(g:, 'colors_name', '') ==# 'gruvbox'
+    highlight! link LspErrorHighlight GruvboxRedUnderline
+    highlight! link LspWarningHighlight GruvboxYellowUnderline
+    highlight! link LspInformationHighlight GruvboxBlueUnderline
+    highlight! link LspHintHighlight GruvboxAquaUnderline
+    highlight! link LspErrorText GruvboxRedSign
+    highlight! link LspWarningText GruvboxYellowSign
+    highlight! link LspInformationText GruvboxBlueSign
+    highlight! link LspHintText GruvboxAquaSign
+    highlight! link LspErrorVirtualText GruvboxRed
+    highlight! link LspWarningVirtualText GruvboxYellow
+    highlight! link LspInformationVirtualText GruvboxBlue
+    highlight! link LspHintVirtualText GruvboxAqua
+    highlight! link ErrorMsg GruvboxRed
+    " Sign glyph groups keep their color but drop the opaque bg strip.
+    highlight GruvboxRedSign guibg=NONE ctermbg=NONE
+    highlight GruvboxGreenSign guibg=NONE ctermbg=NONE
+    highlight GruvboxYellowSign guibg=NONE ctermbg=NONE
+    highlight GruvboxBlueSign guibg=NONE ctermbg=NONE
+    highlight GruvboxPurpleSign guibg=NONE ctermbg=NONE
+    highlight GruvboxAquaSign guibg=NONE ctermbg=NONE
+    highlight GruvboxOrangeSign guibg=NONE ctermbg=NONE
+  elseif get(g:, 'colors_name', '') ==# 'everforest'
+    highlight! link LspErrorHighlight DiagnosticUnderlineError
+    highlight! link LspWarningHighlight DiagnosticUnderlineWarn
+    highlight! link LspInformationHighlight DiagnosticUnderlineInfo
+    highlight! link LspHintHighlight DiagnosticUnderlineHint
+    highlight! link LspErrorText RedSign
+    highlight! link LspWarningText YellowSign
+    highlight! link LspInformationText BlueSign
+    highlight! link LspHintText AquaSign
+    highlight! link LspErrorVirtualText Red
+    highlight! link LspWarningVirtualText Yellow
+    highlight! link LspInformationVirtualText Blue
+    highlight! link LspHintVirtualText Aqua
+    highlight! link ErrorMsg Red
+  endif
 endfunction
 
 function! HiClear()
   hi clear CursorLine
   " hi clear SignColumn
   " hi clear LineNr
+endfunction
+
+function! RefreshLightlinePalette()
+  if !exists('g:lightline') || !exists('g:colors_name')
+    return
+  endif
+  silent! execute 'runtime! autoload/lightline/colorscheme/' . g:colors_name . '.vim'
+  call lightline#colorscheme()
+  call lightline#update()
+endfunction
+
+function! SwitchTerminalTheme()
+  let theme_map={
+        \ 'gruvbox': {'dark': 'gruvbox_dark', 'light': 'gruvbox_light'},
+        \ 'everforest': {'dark': 'everforest_dark_soft', 'light': 'everforest_light_soft'},
+        \ }
+  let script=$HOME . '/.config/theme/switch_colorscheme.sh'
+  if !has_key(theme_map, get(g:, 'colors_name', '')) || !executable(script)
+    return
+  endif
+  let theme=theme_map[g:colors_name][&background]
+  if has('job')
+    call job_start([script, theme])
+  else
+    call system(script . ' ' . theme . ' &')
+  endif
+endfunction
+
+function! SyncColorschemeWithTerminal()
+  let name=$LC_THEME
+  if name ==# ''
+    let conf=$HOME . '/.config/theme/colorschemes.toml'
+    if !filereadable(conf)
+      return 0
+    endif
+    " Basename of the imported theme file, e.g. 'gruvbox_dark'.
+    let name=substitute(matchstr(join(readfile(conf)), '[^"/]\+\.toml'), '\.toml$', '', '')
+  endif
+  if name !~# '^\(gruvbox\|everforest\)_'
+    " Foreign theme: keep the default scheme.
+    " Follow the dark/light suffix (unknown suffix assumed dark).
+    let &background=(name =~# '_light' ? 'light' : 'dark')
+    return 1
+  endif
+  let g:active_colorscheme=split(name, '_')[0]
+  let &background=(name =~# 'light' ? 'light' : 'dark')
+  return 1
 endfunction
 
 function! ToggleBG()
@@ -78,6 +177,8 @@ function! ToggleBG()
   endif
   call HiClear()
   call HiNoneBG()
+  call RefreshLightlinePalette()
+  call SwitchTerminalTheme()
   redraw!
 endfunction
 
@@ -165,8 +266,7 @@ function! ToggleDiagnosticsLSP()
   endif
 endfunction
 
-" Record the initial (enabled) state once per buffer; the actual
-" enable/disable is left to vim-lsp and the <leader>L toggle.
+" Record the initial (enabled) state once per buffer.
 function! InitializeDiagnosticsLSP()
   if exists(":LspDocumentDiagnostics") && !exists("b:lsp_diagnostics_enabled")
     let b:lsp_diagnostics_enabled=1
@@ -186,13 +286,10 @@ augroup END
 
 augroup AdaptColorScheme
   autocmd!
-  " Adapt color scheme.
   autocmd ColorScheme * call HiNoneBG()
   autocmd ColorScheme * call HiClear()
-  " Re-apply custom LSP highlights after the colorscheme's :hi clear.
-  " Set before vim-lsp loads so its 'highlight default link' won't override.
-  autocmd ColorScheme * highlight link LspErrorHighlight Error
-  autocmd ColorScheme * highlight lspReference ctermfg=red guifg=red ctermbg=green guibg=green
+  " Must run before vim-lsp: its defaults are hlexists-guarded, ours win.
+  autocmd ColorScheme * call SetPlugHi()
 augroup END
 
 augroup SetFormatOptions

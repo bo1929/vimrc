@@ -25,10 +25,32 @@ call plug#begin('~/.vim/vim-plug')
   Plug        'tpope/vim-abolish'
   " }}}
 
+  " === colorscheme === {{{
+  " Fallback colorscheme: 'gruvbox' or 'everforest'. At startup the
+  " terminal's canonical theme wins (SyncColorschemeWithTerminal in
+  " misc.vim); this is used only when that state file is missing.
+  let g:active_colorscheme='gruvbox'
+  Plug        'gruvbox-community/gruvbox'
+  let g:gruvbox_contrast_dark='hard'
+  let g:gruvbox_contrast_light='hard'
+  let g:gruvbox_italic=1
+  " }}}
+
+  " === everforest (alternative colorscheme) === {{{
+  " Select it via g:active_colorscheme in the colorscheme section above.
+  Plug        'sainnhe/everforest'
+  let g:everforest_transparent_background=1
+  let g:everforest_disable_italic_comment=0
+  let g:everforest_spell_foreground='colored'
+  let g:everforest_ui_contrast='high'
+  let g:everforest_background='soft'
+  let g:everforest_enable_italic=1
+  " }}}
+
   " === lightline === {{{
   Plug        'itchyny/lightline.vim'
   let g:lightline={
-    \ 'colorscheme': 'everforest',
+    \ 'colorscheme': g:active_colorscheme,
     \ 'active': {
     \   'left': [ [ 'mode', 'paste' ],
     \             [ 'readonly', 'filename', 'modified' ] ],
@@ -53,16 +75,6 @@ call plug#begin('~/.vim/vim-plug')
     \ }
   " }}}
 
-  " === everforest === {{{
-  Plug        'sainnhe/everforest'
-  let g:everforest_transparent_background=1
-  let g:everforest_disable_italic_comment=0
-  let g:everforest_spell_foreground='colored'
-  let g:everforest_ui_contrast='high'
-  let g:everforest_background='soft'
-  let g:everforest_enable_italic=1
-  " }}}
-
   " === quick-scope === {{{
   Plug 'unblevable/quick-scope' 
   let g:qs_highlight_on_keys=['f', 'F', 't', 'T']
@@ -70,19 +82,21 @@ call plug#begin('~/.vim/vim-plug')
   " }}}
 
   " === gutentags === {{{
-  if executable('ctags')
-    Plug        'ludovicchabant/vim-gutentags'
-    " Keep tag files out of project roots.
-    call mkdir($HOME . '/.cache/vim/tags', 'p')
-    let g:gutentags_cache_dir=$HOME . '/.cache/vim/tags'
-  endif
-  " }}}
-
-  " === vista === {{{
-  if executable('ctags')
-    Plug 'liuchengxu/vista.vim'
-    let g:vista_default_executive = 'ctags'
-  endif
+  let s:ctags_path='/usr/bin/ctags'
+  for s:ctags_path in [
+        \ '/opt/homebrew/opt/ctags/bin/ctags',
+        \ '/usr/bin/ctags',
+        \ 'ctags',
+        \ ]
+    if executable(s:ctags_path)
+      Plug        'ludovicchabant/vim-gutentags'
+      let g:gutentags_ctags_executable=s:ctags_path
+      " Keep tag files out of project roots.
+      call mkdir($HOME . '/.cache/vim/tags', 'p')
+      let g:gutentags_cache_dir=$HOME . '/.cache/vim/tags'
+      break
+    endif
+  endfor
   " }}}
 
   " === matchup === {{{
@@ -97,7 +111,7 @@ call plug#begin('~/.vim/vim-plug')
   " }}}
 
   " === markdown === {{{
-  Plug	      'bo1929/vim-markdown'
+  Plug    'bo1929/vim-markdown'
   " }}}
 
   " === la/tex === {{{ 
@@ -138,13 +152,12 @@ call plug#begin('~/.vim/vim-plug')
   " }}}
 
   " === asyncrun === {{{
-  Plug	      'skywind3000/asyncrun.vim'
+  Plug    'skywind3000/asyncrun.vim'
   " }}}
 
   " === asyncomplete === {{{
   Plug 'prabirshrestha/asyncomplete.vim'
   Plug 'prabirshrestha/asyncomplete-lsp.vim'
-  " Keep our own completeopt (with preview) instead of asyncomplete's.
   let g:asyncomplete_auto_completeopt=0
   Plug 'hiterm/asyncomplete-look'
   au User asyncomplete_setup call asyncomplete#register_source({
@@ -188,7 +201,7 @@ call plug#begin('~/.vim/vim-plug')
 
   " === tagbar === {{{
   " if executable('ctags')
-  "   Plug	      'preservim/tagbar'
+  "   Plug    'preservim/tagbar'
   "   " let g:tagbar_position='leftabove vertical'
   " endif
   " }}}

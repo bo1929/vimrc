@@ -1,4 +1,4 @@
-" Use Vim defaults (must come first, it resets other options).
+" Fallback guard; vimrc already sets nocompatible first.
 if &compatible
   set nocompatible
 endif
@@ -170,18 +170,17 @@ if exists('+termguicolors')
   set termguicolors
 endif
 
-" Adopt the terminal's canonical theme.
-" Fall back to the g:active_colorscheme:
-" (default from plugins.vim when unavailable)
+" Adopt the terminal's theme; fall back to g:active_colorscheme
+" (get() guards against plugins.vim having failed to define it).
 if !SyncColorschemeWithTerminal()
-  if g:active_colorscheme ==# 'gruvbox'
+  if get(g:, 'active_colorscheme', 'gruvbox') ==# 'gruvbox'
     set background=dark
   else
     set background=light
   endif
 endif
 try
-  execute 'colorscheme ' . g:active_colorscheme
+  execute 'colorscheme ' . get(g:, 'active_colorscheme', 'gruvbox')
 catch /^Vim\%((\a\+)\)\=:E185/
   colorscheme darkblue
 endtry

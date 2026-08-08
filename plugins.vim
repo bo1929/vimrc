@@ -26,9 +26,8 @@ call plug#begin('~/.vim/vim-plug')
   " }}}
 
   " === colorscheme === {{{
-  " Fallback colorscheme: 'gruvbox' or 'everforest'. At startup the
-  " terminal's canonical theme wins (SyncColorschemeWithTerminal in
-  " misc.vim); this is used only when that state file is missing.
+  " Fallback colorscheme; the terminal's theme state wins when present
+  " (see SyncColorschemeWithTerminal in misc.vim).
   let g:active_colorscheme='gruvbox'
   Plug        'gruvbox-community/gruvbox'
   let g:gruvbox_contrast_dark='hard'
@@ -104,10 +103,8 @@ call plug#begin('~/.vim/vim-plug')
   let g:matchup_matchparen_offscreen = {'method': 'status_manual'}
   " }}}
 
-  " === cxx === {{{
-  " === vim-cpp-modern === {{{
+  " === cpp === {{{
   Plug        'bfrg/vim-cpp-modern'
-  " }}}
   " }}}
 
   " === markdown === {{{
@@ -177,8 +174,7 @@ call plug#begin('~/.vim/vim-plug')
   let g:lsp_semantic_enabled=0
   let g:lsp_diagnostics_echo_cursor=0
   " let g:lsp_diagnostics_float_cursor=1
-  " Custom LspErrorHighlight/lspReference highlights live in misc.vim's
-  " AdaptColorScheme autocmd — set here they get wiped by :hi clear.
+  " LSP highlight overrides live in misc.vim (ColorScheme autocmd).
   let g:lsp_diagnostics_signs_error={'text': '✗'}
   let g:lsp_diagnostics_signs_warning={'text': '¿'}
   let g:lsp_diagnostics_virtual_text_enabled=0

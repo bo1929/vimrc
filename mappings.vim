@@ -41,8 +41,7 @@ noremap <Down> <Nop>
 noremap <Left> <Nop>
 noremap <Right> <Nop>
 
-" Clear \ register.
-" As a result remove highlighting.
+" Clear the search register (removes highlighting).
 nnoremap <silent> \ :let @/=""<CR>
 
 " Do a search for the text in the " register.
